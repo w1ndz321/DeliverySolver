@@ -45,7 +45,7 @@ function sleep(ms) {
 }
 
 async function getJSON(url, options) {
-  const response = await fetch(url, options);
+  const response = await fetch(withEdgeOnePreviewAuth(url), options);
   const text = await response.text();
   let body;
   try {
@@ -59,6 +59,19 @@ async function getJSON(url, options) {
   }
   if (!response.ok) throw new Error(body.error || `Request failed: ${response.status}`);
   return body;
+}
+
+function withEdgeOnePreviewAuth(url) {
+  if (!url.startsWith("/api/")) return url;
+  const pageParams = new URLSearchParams(window.location.search);
+  const edgeParams = [...pageParams.entries()].filter(([key]) => key.startsWith("eo_"));
+  if (!edgeParams.length) return url;
+
+  const apiURL = new URL(url, window.location.origin);
+  edgeParams.forEach(([key, value]) => {
+    if (!apiURL.searchParams.has(key)) apiURL.searchParams.set(key, value);
+  });
+  return `${apiURL.pathname}${apiURL.search}`;
 }
 
 function setStatus(kind, text) {
