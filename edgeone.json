@@ -1,0 +1,5 @@
+{
+  "buildCommand": "python3 scripts/prepare_edgeone.py",
+  "outputDirectory": "edgeone-dist",
+  "installCommand": ""
+}

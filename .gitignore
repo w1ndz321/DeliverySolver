@@ -11,3 +11,4 @@ reports/updated_rule_memory.json
 reports/strategy_improvement_suggestions.md
 reports/*/
 .DS_Store
+edgeone-dist/
