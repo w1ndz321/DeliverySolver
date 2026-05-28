@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoSolver Demo · large_seed301 闭环演示</title>
+  <meta name="description" content="large_seed301 数据集的 AutoSolver 在线与离线闭环演示。">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./">
+      <span></span>
+      <strong>AutoSolver Demo</strong>
+    </a>
+    <div class="dataset-pill">large_seed301</div>
+    <nav class="quick-links">
+      <a href="./">项目首页</a>
+      <a href="#algorithm-library-section">算法库</a>
+      <a href="#scene-catalog-section">场景分类</a>
+    </nav>
+    <a class="back" href="./">返回项目介绍</a>
+  </header>
+
+  <main class="workspace">
+    <section class="demo-shell">
+      <aside class="surface control-panel">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">INPUT DATA</p>
+            <h2>输入与运行</h2>
+          </div>
+        </div>
+
+        <div class="module-block data-module">
+          <h3>输入数据</h3>
+          <div class="file-card">
+            <div class="file-icon">TXT</div>
+            <div>
+              <b id="dataset-name">large_seed301.txt</b>
+              <span id="dataset-source">默认演示数据集 · 可上传同格式 TSV/TXT 替换</span>
+            </div>
+          </div>
+
+          <div class="upload-box">
+            <label class="upload-drop">
+              <input id="dataset-file" type="file" accept=".txt,.tsv,.csv,text/plain,text/tab-separated-values">
+              <span>上传数据集</span>
+              <b>选择同格式 TXT/TSV 文件</b>
+            </label>
+            <button id="default-dataset-button" class="ghost-button small" type="button">切回 large_seed301</button>
+            <p id="dataset-message" class="config-note">上传内容只在本次运行请求中使用。</p>
+          </div>
+
+          <div id="dataset-summary" class="side-summary">
+            <div><span>订单数</span><b>--</b></div>
+            <div><span>骑手数</span><b>--</b></div>
+            <div><span>数据行数</span><b>--</b></div>
+          </div>
+        </div>
+
+        <div class="module-block mode-module">
+          <h3>运行模式</h3>
+          <div class="mode-toggle" role="radiogroup" aria-label="运行模式">
+            <label>
+              <input type="radio" name="run-mode" value="online" checked>
+              <span>在线闭环</span>
+              <small>快速求解并返回 final_submit</small>
+            </label>
+            <label>
+              <input type="radio" name="run-mode" value="offline">
+              <span>离线闭环</span>
+              <small>消融实验并沉淀经验库</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="module-block budget-module">
+          <h3>运行预算</h3>
+          <label id="online-budget-row">
+            <span>在线预算（秒）</span>
+            <input id="time-budget" type="number" min="1" max="30" step="1" value="10">
+          </label>
+          <label id="offline-budget-row" hidden>
+            <span>最大迭代轮数</span>
+            <input id="offline-iterations" type="number" min="1" max="20" step="1" value="5">
+          </label>
+          <p id="budget-note" class="config-note">在线 Agent 在预算内选择 Top-K 策略、并行评分、调参迭代，返回当前最优代码。</p>
+          <button id="start-run-button" class="primary-run" type="button">开始运行</button>
+        </div>
+
+        <details class="module-block llm-config">
+          <summary>
+            <h3>LLM API</h3>
+            <strong id="llm-status" class="llm-status idle">未配置</strong>
+          </summary>
+          <label>
+            <span>API Key</span>
+            <input id="llm-api-key" type="password" autocomplete="off" placeholder="sk-...">
+          </label>
+          <label>
+            <span>Model</span>
+            <input id="llm-model" type="text" value="deepseek-v4-flash">
+          </label>
+          <label>
+            <span>Base URL</span>
+            <input id="llm-base-url" type="text" inputmode="url" value="api.deepseek.com" placeholder="api.deepseek.com">
+          </label>
+          <button id="llm-test-button" class="secondary-button" type="button">测试连接</button>
+          <p id="llm-message" class="config-note">可填 api.deepseek.com；请求时自动补全 /chat/completions。API Key 不写入日志。</p>
+        </details>
+      </aside>
+
+      <section class="center-panel">
+        <section class="top-metrics">
+          <article class="surface status-card">
+            <span>Case Profile</span>
+            <b id="case-type">--</b>
+            <p id="case-summary">等待运行生成数据画像。</p>
+          </article>
+          <article class="surface status-card">
+            <span>当前最优策略</span>
+            <b id="best-strategy">--</b>
+            <p id="best-strategy-meta">在线 Agent 完成后生成。</p>
+          </article>
+          <article class="surface status-card">
+            <span>当前最优得分</span>
+            <b id="best-score">--</b>
+            <p id="best-score-meta">分数越低越好。</p>
+          </article>
+        </section>
+
+        <section class="surface result-stage">
+          <div class="panel-title">
+            <div>
+              <p class="eyebrow">WORKSPACE</p>
+              <h2>闭环执行结果</h2>
+            </div>
+            <strong id="run-status">READY</strong>
+          </div>
+          <div id="stage-results" class="stage-grid">
+            <div class="empty-state tall">在线闭环负责快速返回当前最优代码；离线闭环可独立运行，负责实验复盘和经验库更新。</div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="surface flow-panel">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">AGENT FLOW</p>
+            <h2>运行流程</h2>
+          </div>
+          <span id="trace-count">0/9</span>
+        </div>
+        <div class="flow-actions">
+          <button id="reset-button" class="ghost-button" type="button">重置</button>
+          <button id="interrupt-button" class="ghost-button danger" type="button" disabled>中断</button>
+        </div>
+        <div id="timeline" class="timeline flow-timeline">
+          <div class="trace-empty">点击开始后，在线与离线 Agent 流程会逐步点亮。</div>
+        </div>
+        <div class="final-summary">
+          <span>最终输出</span>
+          <b id="final-summary-strategy">--</b>
+          <strong id="final-summary-score">--</strong>
+        </div>
+      </aside>
+    </section>
+
+    <section class="knowledge-sections">
+      <details class="surface library-panel knowledge-panel" id="algorithm-library-section">
+        <summary class="panel-title">
+          <div>
+            <p class="eyebrow">ALGORITHM LIBRARY</p>
+            <h2>本地算法库</h2>
+          </div>
+          <span>点击展开</span>
+        </summary>
+        <div id="algorithm-library" class="empty-state">正在读取算法库。</div>
+      </details>
+
+      <details class="surface scene-panel knowledge-panel" id="scene-catalog-section">
+        <summary class="panel-title">
+          <div>
+            <p class="eyebrow">SCENE CATALOG</p>
+            <h2>场景分类</h2>
+          </div>
+          <span>点击展开</span>
+        </summary>
+        <div id="scene-catalog" class="empty-state">正在读取场景规则。</div>
+      </details>
+    </section>
+  </main>
+
+  <script src="./demo-fallback.js?v=20260528-static-pages"></script>
+  <script src="./demo.js?v=20260528-static-pages"></script>
+</body>
+</html>
