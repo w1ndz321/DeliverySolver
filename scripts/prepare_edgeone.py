@@ -37,7 +37,7 @@ def main() -> None:
         shutil.rmtree(DIST)
     DIST.mkdir(parents=True)
 
-    for name in ("index.html", "styles.css", "app.js", "demo.html", "demo.css", "demo.js"):
+    for name in ("index.html", "styles.css", "app.js", "demo.html", "demo.css", "demo.js", "demo-fallback.js"):
         copy_file(name)
 
     index = DIST / "index.html"
@@ -55,6 +55,7 @@ def main() -> None:
         .replace('href="/"', 'href="./"')
         .replace('href="/"', 'href="./"')
         .replace('href="/demo.css"', 'href="./demo.css"')
+        .replace('src="/demo-fallback.js', 'src="./demo-fallback.js')
         .replace('src="/demo.js', 'src="./demo.js'),
         encoding="utf-8",
     )

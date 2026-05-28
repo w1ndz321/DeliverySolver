@@ -44,6 +44,37 @@ function sleep(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+function staticFallback() {
+  return window.AUTOSOLVER_STATIC_FALLBACK || null;
+}
+
+function cloneFallback(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function isDefaultDataset() {
+  return state.dataset.source !== "uploaded";
+}
+
+function fallbackResult(kind) {
+  const fallback = staticFallback();
+  if (!fallback) return null;
+  if (kind === "snapshot") return cloneFallback(fallback.snapshot);
+  if (kind === "online" && isDefaultDataset()) return cloneFallback(fallback.online);
+  if (kind === "offline" && isDefaultDataset()) return cloneFallback(fallback.offline);
+  return null;
+}
+
+function markStaticFallback(result, reason) {
+  if (!result || typeof result !== "object") return result;
+  result.static_fallback = {
+    enabled: true,
+    reason,
+    source: "GitHub Pages 静态录制闭环 fallback"
+  };
+  return result;
+}
+
 async function getJSON(url, options) {
   const response = await fetch(withEdgeOnePreviewAuth(url), options);
   const text = await response.text();
@@ -1343,6 +1374,17 @@ function resetDashboard() {
 }
 
 async function previewDataset() {
+  if (isDefaultDataset()) {
+    const fallback = fallbackResult("snapshot");
+    if (fallback) {
+      state.snapshot = markStaticFallback(fallback, "使用 GitHub Pages 静态数据画像 fallback");
+      renderKnowledge(state.snapshot);
+      updateDatasetHeader();
+      updateDatasetSummary(state.snapshot);
+      resetDashboard();
+      return;
+    }
+  }
   const payload = await getJSON("/api/datasets/preview", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -1454,35 +1496,47 @@ function renderOnlineResult(result) {
 
 async function requestOnlineDemo() {
   const signal = state.abortController?.signal;
-  const payload = await getJSON("/api/autosolver/online-demo", {
-    method: "POST",
-    signal,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      time_budget: Number(byId("time-budget")?.value || 10),
-      seed: 301,
-      dataset: getDatasetPayload(),
-      llm: getLLMConfig()
-    })
-  });
-  return payload.result;
+  try {
+    const payload = await getJSON("/api/autosolver/online-demo", {
+      method: "POST",
+      signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        time_budget: Number(byId("time-budget")?.value || 10),
+        seed: 301,
+        dataset: getDatasetPayload(),
+        llm: getLLMConfig()
+      })
+    });
+    return payload.result;
+  } catch (error) {
+    const fallback = fallbackResult("online");
+    if (!fallback || error.name === "AbortError") throw error;
+    return markStaticFallback(fallback, error.message);
+  }
 }
 
 async function requestOfflineDemo(baseResult) {
   const signal = state.abortController?.signal;
-  const payload = await getJSON("/api/autosolver/offline-demo", {
-    method: "POST",
-    signal,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      time_budget: Number(byId("time-budget")?.value || 10),
-      seed: 301,
-      dataset: getDatasetPayload(),
-      llm: getLLMConfig(),
-      offline: getOfflineConfig()
-    })
-  });
-  return payload.result;
+  try {
+    const payload = await getJSON("/api/autosolver/offline-demo", {
+      method: "POST",
+      signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        time_budget: Number(byId("time-budget")?.value || 10),
+        seed: 301,
+        dataset: getDatasetPayload(),
+        llm: getLLMConfig(),
+        offline: getOfflineConfig()
+      })
+    });
+    return payload.result;
+  } catch (error) {
+    const fallback = fallbackResult("offline");
+    if (!fallback || error.name === "AbortError") throw error;
+    return markStaticFallback(fallback, error.message);
+  }
 }
 
 async function runOnlineDemo(keepExisting = false, traceOffset = 0, traceTotal = 7) {
@@ -1582,9 +1636,17 @@ function startSelectedRun() {
 
 async function initialize() {
   relaxBaseURLInputValidation();
-  const payload = await getJSON("/api/datasets/largeseed301");
-  state.snapshot = payload.result;
-  state.defaultSnapshot = payload.result;
+  let snapshot;
+  try {
+    const payload = await getJSON("/api/datasets/largeseed301");
+    snapshot = payload.result;
+  } catch (error) {
+    snapshot = fallbackResult("snapshot");
+    if (!snapshot) throw error;
+    byId("dataset-message").textContent = `后端 API 不可用，已切换静态 fallback：${error.message}`;
+  }
+  state.snapshot = markStaticFallback(snapshot, "初始化使用 GitHub Pages 静态数据画像 fallback");
+  state.defaultSnapshot = state.snapshot;
   renderKnowledge(state.snapshot);
   updateDatasetHeader();
   updateDatasetSummary(state.snapshot);

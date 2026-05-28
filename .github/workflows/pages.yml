@@ -29,16 +29,23 @@ jobs:
 
       - name: Prepare static introduction page
         run: |
+          python3 scripts/build_static_demo_fallback.py
           mkdir -p public
-          cp frontend/index.html frontend/styles.css frontend/app.js public/
+          cp frontend/index.html frontend/styles.css frontend/app.js frontend/demo.html frontend/demo.css frontend/demo.js frontend/demo-fallback.js public/
           python3 - <<'PY'
           from pathlib import Path
 
           index = Path("public/index.html")
           html = index.read_text(encoding="utf-8")
-          html = html.replace('href="./demo.html"', 'href="https://github.com/w1ndz321/DeliverySolver#部署"')
-          html = html.replace(">进入 Demo<", ">Demo 部署说明<")
           index.write_text(html, encoding="utf-8")
+
+          demo = Path("public/demo.html")
+          demo_html = demo.read_text(encoding="utf-8")
+          demo_html = demo_html.replace('href="/demo.css"', 'href="./demo.css"')
+          demo_html = demo_html.replace('src="/demo-fallback.js', 'src="./demo-fallback.js')
+          demo_html = demo_html.replace('src="/demo.js', 'src="./demo.js')
+          demo_html = demo_html.replace('href="/"', 'href="./"')
+          demo.write_text(demo_html, encoding="utf-8")
           PY
 
       - name: Upload static frontend
