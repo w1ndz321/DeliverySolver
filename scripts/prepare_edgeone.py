@@ -16,6 +16,22 @@ def copy_file(name: str) -> None:
     shutil.copy2(FRONTEND / name, DIST / name)
 
 
+def ignore_runtime_noise(_: str, names: list[str]) -> set[str]:
+    return {
+        name
+        for name in names
+        if name == "__pycache__" or name.endswith((".pyc", ".pyo"))
+    }
+
+
+def copy_tree(name: str) -> None:
+    source = ROOT / name
+    target = DIST / name
+    if not source.exists():
+        return
+    shutil.copytree(source, target, ignore=ignore_runtime_noise)
+
+
 def main() -> None:
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -42,6 +58,9 @@ def main() -> None:
         .replace('src="/demo.js', 'src="./demo.js'),
         encoding="utf-8",
     )
+
+    for name in ("cloud-functions", "backend", "agent", "analyzer", "solver", "data", "logs"):
+        copy_tree(name)
 
 
 if __name__ == "__main__":

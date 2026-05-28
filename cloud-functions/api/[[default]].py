@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -12,8 +13,13 @@ if str(PROJECT_ROOT) not in sys.path:
 from backend.app import Handler as AutoSolverHandler
 
 
-class handler(AutoSolverHandler):
-    """Reuse the local HTTP handler for EdgeOne's BaseHTTPRequestHandler runtime."""
+class handler(BaseHTTPRequestHandler):
+    """EdgeOne-recognized handler that delegates to the local API handler."""
+
+    log_message = AutoSolverHandler.log_message
+    json_response = AutoSolverHandler.json_response
+    body = AutoSolverHandler.body
+    static = AutoSolverHandler.static
 
     def _normalize_edgeone_path(self) -> None:
         # EdgeOne removes the file-system route prefix for catch-all Python
@@ -31,8 +37,8 @@ class handler(AutoSolverHandler):
 
     def do_GET(self) -> None:
         self._normalize_edgeone_path()
-        return super().do_GET()
+        return AutoSolverHandler.do_GET(self)
 
     def do_POST(self) -> None:
         self._normalize_edgeone_path()
-        return super().do_POST()
+        return AutoSolverHandler.do_POST(self)
