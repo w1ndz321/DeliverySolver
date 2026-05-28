@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoSolver—For Delivery</title>
+  <meta name="description" content="面向配送订单-骑手分配问题的在线/离线 Agent 自主策略迭代系统。">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-nav">
+    <a class="brand" href="#intro" aria-label="AutoSolver 首页">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <strong>AutoSolver—For Delivery</strong>
+    </a>
+    <nav aria-label="页面导航">
+      <a class="active" href="#intro">项目介绍</a>
+      <a href="#problem">问题背景</a>
+      <a href="#system">系统架构</a>
+      <a class="demo-link" href="https://github.com/w1ndz321/DeliverySolver#部署">Demo 部署说明</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section" id="intro">
+      <div class="hero-visual" aria-hidden="true">
+        <svg class="route-map" viewBox="0 0 760 420" role="img">
+          <path class="route route-a" d="M60 315 C138 226 204 270 270 188 S420 76 535 142 625 254 700 84"/>
+          <path class="route route-b" d="M88 126 C178 64 250 118 326 214 S492 318 635 258"/>
+          <path class="route route-c" d="M160 350 C236 282 308 312 374 250 S488 184 574 208"/>
+          <g class="node pickup" transform="translate(60 315)"><circle r="14"/><text>O1</text></g>
+          <g class="node rider" transform="translate(270 188)"><circle r="16"/><text>R2</text></g>
+          <g class="node pickup" transform="translate(535 142)"><circle r="14"/><text>O4</text></g>
+          <g class="node rider" transform="translate(700 84)"><circle r="16"/><text>R7</text></g>
+          <g class="node pickup" transform="translate(88 126)"><circle r="14"/><text>O2</text></g>
+          <g class="node rider" transform="translate(326 214)"><circle r="16"/><text>R1</text></g>
+          <g class="node pickup" transform="translate(635 258)"><circle r="14"/><text>O6</text></g>
+        </svg>
+        <svg class="rider-icon" viewBox="0 0 1024 1024" aria-hidden="true">
+          <path d="M123.4432 388.7616h301.3632a44.1344 44.1344 0 0 0 44.1344-44.1344V217.5488a44.1344 44.1344 0 0 0-44.1344-44.1344H123.4432a44.1344 44.1344 0 0 0-44.1344 44.1344V344.576c0 24.4224 19.7632 44.1856 44.1344 44.1856z" fill="#F9BF34"/>
+          <path d="M818.1248 552.1408a20.48 20.48 0 0 0-4.5568-2.5088l-14.3872-5.632a19.88608 19.88608 0 0 1-12.6464-18.5344V437.8624c0-3.0208 0.6656-5.9904 1.9968-8.704l13.6192-28.1088c1.9456-4.0448 5.1712-7.3216 9.2672-9.216 26.0096-12.0832 44.0832-38.4 44.0832-68.9664 0-42.0352-34.0992-76.1344-76.1344-76.1344-2.56 0-5.0688 0.1536-7.5776 0.4096V199.168c0-7.8848 4.864-14.6432 11.9296-18.176 4.0448-1.9968 6.8096-4.8128 7.8336-8.2944 3.7888-12.5952-15.9744-29.6448-44.0832-38.0928-28.1088-8.448-53.9648-5.0688-57.7536 7.5264-3.7888 12.5952 15.9744 29.6448 44.0832 38.0928 2.304 0.6656 4.5568 1.28 6.8608 1.792v46.592c0 11.008-8.9088 19.9168-19.9168 19.9168H609.28c-11.008 0-19.9168 8.9088-19.9168 19.9168v26.4192c0 11.008 8.9088 19.9168 19.9168 19.9168h15.104c11.008 0 19.968 8.96 19.9168 19.968l-0.3072 93.4912c0 3.328-0.8704 6.6048-2.4576 9.5232l-84.8384 154.88a19.85024 19.85024 0 0 1-17.4592 10.3424H434.6368c-15.9744 0-25.4464-17.8688-16.4864-31.0784l51.6608-76.288c2.2528-3.2768 3.4304-7.168 3.4304-11.1616v-31.1808c0-11.008-8.9088-19.9168-19.9168-19.9168H100.4032c-11.008 0-19.9168 8.9088-19.9168 19.9168v17.408c0 11.008 8.9088 19.9168 19.9168 19.9168 15.616 0 25.1392 17.1008 16.9472 30.3616l-50.2272 81.3056c-0.3072 0.512-0.6144 0.9728-0.9728 1.4336l-25.856 34.6624a19.968 19.968 0 0 0-3.9424 11.9296v86.1696c0 8.7552 5.7344 16.128 13.568 18.7904 15.3088 78.2848 84.2752 137.4208 167.0144 137.4208 82.3808 0 151.0912-58.5216 166.8096-136.2944h266.8544c15.7184 77.7216 84.4288 136.2944 166.8096 136.2944 94.0032 0 170.24-76.2368 170.24-170.24 0.0512-93.8496-75.8272-169.8816-169.5232-170.2912z" fill="#F49D22"/>
+          <path d="M376.7808 282.112H170.7008c-13.4144 0-24.2688-10.8544-24.2688-24.2688s10.8544-24.2688 24.2688-24.2688h206.08c13.4144 0 24.2688 10.8544 24.2688 24.2688s-10.8544 24.2688-24.2688 24.2688zM216.9344 827.7504c-58.112 0-105.3696-47.2576-105.3696-105.3696 0-58.112 47.2576-105.3696 105.3696-105.3696s105.3696 47.2576 105.3696 105.3696c0 58.112-47.2576 105.3696-105.3696 105.3696z m0-162.2016c-31.3344 0-56.832 25.4976-56.832 56.832 0 31.3344 25.4976 56.7808 56.832 56.7808s56.7808-25.4976 56.7808-56.7808c0.0512-31.3344-25.4464-56.832-56.7808-56.832z" fill="#FFFFFF"/>
+          <path d="M817.4592 827.7504c-58.112 0-105.3696-47.2576-105.3696-105.3696 0-58.112 47.2576-105.3696 105.3696-105.3696s105.3696 47.2576 105.3696 105.3696c0 58.112-47.2576 105.3696-105.3696 105.3696z m0-162.2016c-31.3344 0-56.7808 25.4976-56.7808 56.832 0 31.3344 25.4976 56.7808 56.7808 56.7808 31.3344 0 56.7808-25.4976 56.7808-56.7808 0-31.3344-25.4464-56.832-56.7808-56.832z" fill="#FFFFFF"/>
+        </svg>
+      </div>
+      <div class="hero-heading reveal">
+        <h1>面向配送订单-骑手分配问题的自主策略迭代系统</h1>
+        <p>离线 Agent 沉淀经验库，在线 Agent 根据数据画像快速选择策略，并在时间限制内输出最优求解器。</p>
+      </div>
+
+      <div class="stage-frame reveal delay-1" aria-label="项目架构流程">
+        <div class="stage-progress" aria-hidden="true"></div>
+        <article class="stage-card">
+          <b>01</b>
+          <h2>数据画像</h2>
+          <p>提取订单规模、骑手供给、候选密度、合单比例和接单意愿分布。</p>
+        </article>
+        <article class="stage-card">
+          <b>02</b>
+          <h2>自主选策略</h2>
+          <p>在线 Agent 基于 case profile 和经验库判断数据类型，选择最合适的候选算法。</p>
+        </article>
+        <article class="stage-card">
+          <b>03</b>
+          <h2>自动评测诊断</h2>
+          <p>对候选解做合法性、目标分数、覆盖率和失败模式诊断，只保留有效改进。</p>
+        </article>
+        <article class="stage-card">
+          <b>04</b>
+          <h2>迭代更优算法</h2>
+          <p>离线 Agent 从实验日志中探索新策略，把验证有效的规则沉淀回经验库。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="problem section" id="problem">
+      <div class="section-heading reveal">
+        <p class="eyebrow">PROBLEM REQUIREMENT</p>
+        <h2>赛题要求</h2>
+        <p>配送订单-骑手分配本质上是带约束的组合优化问题。它具有 NP-hard 特征，难点不只是找到合法解，而是在有限时间内尽可能产出更优解。</p>
+      </div>
+
+      <div class="problem-layout">
+        <div class="formula-block reveal delay-1">
+          <span>核心判断</span>
+          <h3>不同场景需要不同策略</h3>
+          <p>订单规模、骑手供给、候选密度、合单比例、接单意愿分布都会改变最优算法选择。固定贪心在某些场景有效，但在骑手稀缺、合单丰富或低意愿风险高的场景里可能失效。</p>
+        </div>
+        <div class="requirements reveal delay-2">
+          <article>
+            <b>01</b>
+            <h3>为什么引入 Agent</h3>
+            <p>Agent 的作用是把“人工试算法”变成自动研究过程：分析数据特征，选择候选策略，运行评测，再根据失败模式继续生成和筛选更优算法。</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>离线 Agent 沉淀经验</h3>
+            <p>离线状态没有在线响应压力，可以让 Agent 反复探索策略、做消融实验、总结哪些数据类型适合哪些算法，并把结论写入经验库。</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>在线 Agent 快速决策</h3>
+            <p>在线运行时有严格效率要求，因此不重新做大规模搜索，而是先生成 case profile，再从经验库快速判断数据类型并选择最合适的求解策略。</p>
+          </article>
+          <article>
+            <b>04</b>
+            <h3>项目交付目标</h3>
+            <p>最终交付的是一个可持续进化的 AutoResearch Agent 系统：离线自主优化算法，在线高效选择算法，在时间限制内输出当前最优 solver。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="system section" id="system">
+      <div class="section-heading reveal">
+        <p class="eyebrow">HOW AUTOSOLVER WORKS</p>
+        <h2>系统架构</h2>
+        <p>系统把“离线研究”和“在线求解”拆开：离线 Agent 负责探索、评测和沉淀经验，在线 Agent 只做快速画像、查经验库和调用稳定 solver。</p>
+      </div>
+
+      <div class="flow reveal delay-1">
+        <article>
+          <span>01</span>
+          <h3>离线研究 Agent</h3>
+          <p>在无响应压力的环境里生成候选算法，做消融实验，记录不同场景下的收益和失败模式。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>策略经验库</h3>
+          <p>沉淀 case type、特征阈值、适用算法、风险约束和历史评测结果，形成可复用的决策依据。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>在线决策 Agent</h3>
+          <p>运行时只做轻量数据画像，从经验库判断当前数据类型，快速选出最合适的稳定策略。</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Solver 输出层</h3>
+          <p>执行已验证的算法模块，完成合法性检查和目标分数评估，在时间限制内输出当前最优解。</p>
+        </article>
+      </div>
+
+      <div class="system-footer reveal delay-2">
+        <p>最终提交路径保持轻量：研究、评测和迭代在 Agent 系统中完成；OJ solver 只保留已验证的稳定求解模块。</p>
+        <a class="primary-action" href="https://github.com/w1ndz321/DeliverySolver#部署">Demo 部署说明</a>
+      </div>
+    </section>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
