@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+backend/runtime/
+logs/runs/
+outputs/*/
+outputs/*.json
+reports/*/
+state/
+.git/
+.DS_Store

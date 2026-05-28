@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: autosolver-agent-studio
+    runtime: python
+    plan: starter
+    buildCommand: "true"
+    startCommand: "python3 backend/app.py"
+    healthCheckPath: /api/health
+    envVars:
+      - key: AUTOSOLVER_STATE_DIR
+        value: /opt/render/project/src/state
+    disk:
+      name: autosolver-state
+      mountPath: /opt/render/project/src/state
+      sizeGB: 1

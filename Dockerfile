@@ -1,0 +1,10 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY . .
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV AUTOSOLVER_STATE_DIR=/app/state
+EXPOSE 8080
+
+CMD ["python3", "backend/app.py"]

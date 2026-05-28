@@ -1,0 +1,365 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-27T05:57:45.026495+00:00",
+  "evidence_runs": 30,
+  "case_types": {
+    "pair_rich": {
+      "evidence_runs": 20,
+      "preferred_strategies": [
+        "local_search",
+        "expected_cost_greedy"
+      ],
+      "average_scores": {
+        "baseline_greedy": 2097.657539,
+        "expected_cost_greedy": 968.750027,
+        "gain_greedy": 1315.055886,
+        "coverage_first": 973.695216,
+        "scarce_pair": 1007.582883,
+        "local_search": 749.633956,
+        "destroy_repair": 749.633956,
+        "online_risk_guard_pair_rich": 972.076832,
+        "online_pair_guard_pair_rich": 1106.161914,
+        "online_balanced_ranker_pair_rich": 994.825015,
+        "offline_learned_pair_rich": 1084.441493
+      },
+      "strategy_parameters": {},
+      "strategy_modules": {},
+      "valuable_features": [
+        {
+          "name": "courier_task_ratio",
+          "value": 2.0,
+          "source": "offline_llm"
+        },
+        {
+          "name": "pair_bundle_ratio",
+          "value": 0.905269,
+          "source": "offline_llm"
+        },
+        {
+          "name": "willingness_mean",
+          "value": 0.299973,
+          "source": "offline_llm"
+        },
+        {
+          "name": "conflict_density",
+          "value": 0.103204,
+          "source": "offline_llm"
+        }
+      ],
+      "diagnostics": {
+        "unused_pair_supply": 20
+      },
+      "offline_agent": {
+        "llm_required": true,
+        "ablation_decision": {
+          "used_llm": false,
+          "status": "not_configured",
+          "model": "deepseek-chat",
+          "decision": {
+            "valuable_features": [
+              "courier_task_ratio",
+              "pair_bundle_ratio",
+              "willingness_mean",
+              "conflict_density"
+            ],
+            "ablation_trials": [
+              {
+                "name": "offline_ablation_pair_rich",
+                "parameters": {
+                  "expected_weight": 1.0,
+                  "gain_weight": 0.05,
+                  "scarcity_weight": 0.8,
+                  "willingness_weight": 18.0,
+                  "pair_bonus": 16.0,
+                  "high_cost_penalty": 0.6,
+                  "repair": true
+                },
+                "hypothesis": "low willingness made rejection risk important; pair bundles were available"
+              }
+            ],
+            "promotion_rule": "promote only if score improves over the best logged strategy",
+            "should_create_algorithm": false
+          },
+          "raw_text": "",
+          "error": null
+        },
+        "ablation_result": {
+          "status": "ok",
+          "baseline_score": 749.6339555705864,
+          "trials": [
+            {
+              "strategy": "baseline_greedy",
+              "status": "ok",
+              "runtime_ms": 14.085,
+              "score": 2097.6575390000007,
+              "evaluation": {
+                "valid": true,
+                "score": 2097.6575390000007,
+                "covered_tasks": 40,
+                "uncovered_tasks": 0,
+                "used_couriers": 40,
+                "errors": [],
+                "score_decomposition": {
+                  "total_score": 2097.6575390000007,
+                  "uncovered_penalty": 0.0,
+                  "selected_expected_cost": 226.25753900000004,
+                  "rejection_risk_cost": 1871.4000000000005,
+                  "high_cost_bundle_count": 0,
+                  "low_gain_selected_count": 0
+                }
+              },
+              "parameters": {},
+              "error": null
+            },
+            {
+              "strategy": "offline_ablation_pair_rich",
+              "status": "ok",
+              "runtime_ms": 31.084,
+              "score": 1084.4414935,
+              "evaluation": {
+                "valid": true,
+                "score": 1084.4414935,
+                "covered_tasks": 40,
+                "uncovered_tasks": 0,
+                "used_couriers": 33,
+                "errors": [],
+                "score_decomposition": {
+                  "total_score": 1084.4414935,
+                  "uncovered_penalty": 0.0,
+                  "selected_expected_cost": 615.5914935,
+                  "rejection_risk_cost": 468.85,
+                  "high_cost_bundle_count": 0,
+                  "low_gain_selected_count": 0
+                }
+              },
+              "parameters": {
+                "expected_weight": 1.0,
+                "gain_weight": 0.05,
+                "scarcity_weight": 0.8,
+                "willingness_weight": 18.0,
+                "pair_bonus": 16.0,
+                "high_cost_penalty": 0.6,
+                "repair": true
+              },
+              "error": null
+            }
+          ],
+          "best_trial": {
+            "strategy": "offline_ablation_pair_rich",
+            "status": "ok",
+            "runtime_ms": 31.084,
+            "score": 1084.4414935,
+            "evaluation": {
+              "valid": true,
+              "score": 1084.4414935,
+              "covered_tasks": 40,
+              "uncovered_tasks": 0,
+              "used_couriers": 33,
+              "errors": [],
+              "score_decomposition": {
+                "total_score": 1084.4414935,
+                "uncovered_penalty": 0.0,
+                "selected_expected_cost": 615.5914935,
+                "rejection_risk_cost": 468.85,
+                "high_cost_bundle_count": 0,
+                "low_gain_selected_count": 0
+              }
+            },
+            "parameters": {
+              "expected_weight": 1.0,
+              "gain_weight": 0.05,
+              "scarcity_weight": 0.8,
+              "willingness_weight": 18.0,
+              "pair_bonus": 16.0,
+              "high_cost_penalty": 0.6,
+              "repair": true
+            },
+            "error": null
+          },
+          "improved": false,
+          "improvement": 0.0
+        },
+        "promoted": false
+      }
+    },
+    "pair_rich+low_willingness": {
+      "evidence_runs": 10,
+      "preferred_strategies": [
+        "local_search"
+      ],
+      "average_scores": {
+        "baseline_greedy": 2665.710256,
+        "expected_cost_greedy": 2440.757075,
+        "gain_greedy": 2524.989109,
+        "coverage_first": 2438.269407,
+        "scarce_pair": 2527.298569,
+        "local_search": 2079.786783,
+        "destroy_repair": 2079.786783,
+        "online_risk_guard_pair_rich_low_willingness": 2438.693789,
+        "online_pair_guard_pair_rich_low_willingness": 2552.520253,
+        "online_balanced_ranker_pair_rich_low_willingness": 2513.876351,
+        "offline_learned_pair_rich_low_willingness": 2552.714845
+      },
+      "strategy_parameters": {},
+      "strategy_modules": {},
+      "valuable_features": [
+        {
+          "name": "courier_task_ratio",
+          "value": 2.0,
+          "source": "offline_llm"
+        },
+        {
+          "name": "pair_bundle_ratio",
+          "value": 0.635628,
+          "source": "offline_llm"
+        },
+        {
+          "name": "willingness_mean",
+          "value": 0.091506,
+          "source": "offline_llm"
+        },
+        {
+          "name": "conflict_density",
+          "value": 0.105741,
+          "source": "offline_llm"
+        }
+      ],
+      "diagnostics": {
+        "rejection_risk_dominates": 10,
+        "unused_pair_supply": 10
+      },
+      "offline_agent": {
+        "llm_required": true,
+        "ablation_decision": {
+          "used_llm": false,
+          "status": "not_configured",
+          "model": "deepseek-chat",
+          "decision": {
+            "valuable_features": [
+              "courier_task_ratio",
+              "pair_bundle_ratio",
+              "willingness_mean",
+              "conflict_density"
+            ],
+            "ablation_trials": [
+              {
+                "name": "offline_ablation_pair_rich_low_willingness",
+                "parameters": {
+                  "expected_weight": 1.0,
+                  "gain_weight": 0.05,
+                  "scarcity_weight": 0.8,
+                  "willingness_weight": 18.0,
+                  "pair_bonus": 16.0,
+                  "high_cost_penalty": 0.6,
+                  "repair": true
+                },
+                "hypothesis": "low willingness made rejection risk important; pair bundles were available"
+              }
+            ],
+            "promotion_rule": "promote only if score improves over the best logged strategy",
+            "should_create_algorithm": false
+          },
+          "raw_text": "",
+          "error": null
+        },
+        "ablation_result": {
+          "status": "ok",
+          "baseline_score": 2079.786782697074,
+          "trials": [
+            {
+              "strategy": "baseline_greedy",
+              "status": "ok",
+              "runtime_ms": 1.707,
+              "score": 2665.7102555249994,
+              "evaluation": {
+                "valid": true,
+                "score": 2665.7102555249994,
+                "covered_tasks": 30,
+                "uncovered_tasks": 0,
+                "used_couriers": 30,
+                "errors": [],
+                "score_decomposition": {
+                  "total_score": 2665.7102555249994,
+                  "uncovered_penalty": 0.0,
+                  "selected_expected_cost": 40.93025552499999,
+                  "rejection_risk_cost": 2624.7799999999993,
+                  "high_cost_bundle_count": 0,
+                  "low_gain_selected_count": 0
+                }
+              },
+              "parameters": {},
+              "error": null
+            },
+            {
+              "strategy": "offline_ablation_pair_rich_low_willingness",
+              "status": "ok",
+              "runtime_ms": 4.31,
+              "score": 2552.7148453750006,
+              "evaluation": {
+                "valid": true,
+                "score": 2552.7148453750006,
+                "covered_tasks": 30,
+                "uncovered_tasks": 0,
+                "used_couriers": 16,
+                "errors": [],
+                "score_decomposition": {
+                  "total_score": 2552.7148453750006,
+                  "uncovered_penalty": 0.0,
+                  "selected_expected_cost": 116.977345375,
+                  "rejection_risk_cost": 2435.7375000000006,
+                  "high_cost_bundle_count": 0,
+                  "low_gain_selected_count": 0
+                }
+              },
+              "parameters": {
+                "expected_weight": 1.0,
+                "gain_weight": 0.05,
+                "scarcity_weight": 0.8,
+                "willingness_weight": 18.0,
+                "pair_bonus": 16.0,
+                "high_cost_penalty": 0.6,
+                "repair": true
+              },
+              "error": null
+            }
+          ],
+          "best_trial": {
+            "strategy": "offline_ablation_pair_rich_low_willingness",
+            "status": "ok",
+            "runtime_ms": 4.31,
+            "score": 2552.7148453750006,
+            "evaluation": {
+              "valid": true,
+              "score": 2552.7148453750006,
+              "covered_tasks": 30,
+              "uncovered_tasks": 0,
+              "used_couriers": 16,
+              "errors": [],
+              "score_decomposition": {
+                "total_score": 2552.7148453750006,
+                "uncovered_penalty": 0.0,
+                "selected_expected_cost": 116.977345375,
+                "rejection_risk_cost": 2435.7375000000006,
+                "high_cost_bundle_count": 0,
+                "low_gain_selected_count": 0
+              }
+            },
+            "parameters": {
+              "expected_weight": 1.0,
+              "gain_weight": 0.05,
+              "scarcity_weight": 0.8,
+              "willingness_weight": 18.0,
+              "pair_bonus": 16.0,
+              "high_cost_penalty": 0.6,
+              "repair": true
+            },
+            "error": null
+          },
+          "improved": false,
+          "improvement": 0.0
+        },
+        "promoted": false
+      }
+    }
+  }
+}

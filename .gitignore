@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+backend/runtime/*.sqlite3
+logs/runs/
+outputs/*/
+outputs/*.json
+outputs/*.py
+!outputs/README.md
+reports/failure_analysis_report.md
+reports/updated_rule_memory.json
+reports/strategy_improvement_suggestions.md
+reports/*/
+.DS_Store
