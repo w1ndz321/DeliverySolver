@@ -9,7 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://w1ndz321.github.io/DeliverySolver/">项目展示</a>
+  <a href="https://w1ndz321.github.io/DeliverySolver/">项目展示</a> ·
+  <a href="https://w1ndz321.github.io/DeliverySolver/demo.html">DEMO</a>
 </p>
 
 <p align="center">
